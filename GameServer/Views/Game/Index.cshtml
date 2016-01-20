@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "Melrose Games";
+}
+<html>
+<body>
+<div id="Newgame">
+    <p>Start a New Game</p>
+    <p>
+        @foreach (string s in ViewBag.GameNames)
+        {
+            @Html.ActionLink(s, "New" + s)
+            ;
+        }
+    </p>
+</div>
+
+</body>
+</html>

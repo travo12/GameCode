@@ -1,0 +1,221 @@
+﻿@model Planc.Dal.GameModels.LeeGame.Lee
+@{
+    ViewBag.Title = "Lee Game" + Model.Id;
+}
+<!DOCTYPE html>
+
+<html ng-app="lee">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lee</title>
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Style/Lee.css" rel="stylesheet" />
+
+    <script src="~/Scripts/Lee.js"></script>
+</head>
+<body ng-controller="LeeController">
+
+    <div id="wrapper">
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" id="menu-toggle">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">PlanC Games</a>
+                </div>
+            </div>
+        </div>
+        <div id="sidebar-wrapper">
+            <div class="sidebar-nav">
+                <div class = "chatarea">
+                <ul class="messages"></ul>
+                </div>
+                <input class="inputmessage" placeholder="Type here..." ng-enter="sendChat()" />
+            </div>
+        </div>
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row" ng-show="Game.State !== 1">
+                    <div class="col-xs-12">
+                        <h2 class="text-center">Round {{ Game.CurrentRoundNum }}</h2>
+                    </div>
+                </div>
+                <!-- TODO: Change this to have it show people waiting-->
+                <div class="row" id="selectName" ng-show="State === 1 && !Waiting">
+                    <div class="col-xs-12">
+                        <h2 class="text-center">Waiting for other Players</h2>
+                    </div>
+                </div>
+                <div class="row" ng-repeat="player in LobbyData.Names" ng-show="State === 1 && !Waiting">
+                    <div class="col-xs-12">
+                        {{ player }}
+                    </div>
+                </div>
+                <div ng-show="LobbyData.Admin === true && State === 1 && !Waiting">
+                    <button class="btn btn-primary" id="startbutton" ng-click="startGame()">Start</button>
+                </div>
+                <div class="row" id="waiting" ng-show="Waiting">
+                    <div class="col-xs-12">
+                        <h2 class="text-center">Waiting on Players</h2>
+                    </div>
+                </div>
+                <div class="col-xs-4 col-xs-offset-4" ng-show="Waiting">
+                    <table class="table">
+                        <tr class="row" ng-repeat="player in WaitingPlayers">
+                            <td>
+                                {{ player.Name }}
+                            </td>
+                            <td>
+                                {{ player.Status }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="row" id="qna" ng-show="State === 2 && !Waiting">
+                    <div class="col-xs-12">
+                        <h3 class="text-center">{{ Question }}</h3>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 2 && !Waiting">
+                    <div class="col-xs-12">
+                        <textarea type="text" class="form-control" id="answer" rows="4" placeholder="Answer" ng-enter="setPlayerAnswer()"></textarea>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 2 && !Waiting">
+                    <div class="col-xs-12 text-center">
+                        <button class="btn btn-primary full-length" id="playbutton" ng-click="setPlayerAnswer()">Answer</button>
+                    </div>
+                </div>
+                <div class="row" id="vote" ng-show="State === 3 && !Waiting">
+                    <div class="col-xs-12">
+                        <div class="panel panel-success">
+                            <h4 class="text-center">{{ Question }}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 3 && !Waiting">
+                    <div class="col-lg-12">
+                        <div class="panel panel-success">
+                            <div class="panel-body text-center">
+                                <p>Choose the best Response</p>
+                            </div>
+                            <ul class="list-group" ng-repeat="answerResponse in PlayerAnswers">
+                                <li class="list-group-item" ng-click="setPlayerVote(answerResponse.PlayerId)">{{ answerResponse.Answer }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="results" ng-show="State === 4 && !Waiting">
+                    <div class="col-xs-12">
+                        <h3 class="text-center">Points</h3>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 4 && !Waiting">
+                    <div class="col-xs-4 col-xs-offset-4">
+                        <table class="table">
+                            <tr class="row" ng-repeat="pinput in ResultsData.PlayerInputs | orderBy:VR">
+                                <td>
+                                    {{ pinput.Name }}
+                                </td>
+                                <td>
+                                    {{ pinput.Score }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 4 && !Waiting">
+                    <div class="col-xs-12">
+                        <h2 class="text-center text-green">{{ WinnerText }}</h2>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 4 && !Waiting">
+                    <div class="col-xs-12">
+                        <h3 class="text-center">Votes</h3>
+                    </div>
+                </div>
+                <div class="row" ng-repeat="pinput in ResultsData.PlayerInputs | orderBy:VR" ng-show="State === 4 && !Waiting">
+                    <div class="col-xs-12">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                {{ pinput.Name }}'s Response: {{ pinput.Answer }}
+                            </div>
+                            <div class="panel-footer">
+                                Votes:<br />
+                                <span ng-repeat="voterName in ResultsData.PlayerInputs | vote:pinput">{{ voterName.Name }}<br /></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 4 && !Waiting">
+                    <div class="col-xs-12">
+                        <h3 class="text-center">Leader Board</h3>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 4 && !Waiting">
+                    <div class="col-xs-4 col-xs-offset-4">
+                        <table class="table">
+                            <tr class="row" ng-repeat="player in ResultsData.PlayerGames | orderBy:Points">
+                                <td>
+                                    {{ player.Name }}
+                                </td>
+                                <td>
+                                    {{ player.Points }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 4 && !Waiting">
+                    <div class="col-xs-12" ng-show="ResultsData.Admin === true">
+                        <button class=" btn btn-primary" id="newroundbutton" ng-click="newRound()">
+                            Next Round
+                        </button>
+                    </div>
+                </div>
+                <div class="row" id="final" ng-show="State === 5">
+                    <div class="col-xs-12">
+                        <h2 class="text-center text-green">Game Over</h2>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 5">
+                    <div class="col-xs-12">
+                        <h3 class="text-center">Leader Board</h3>
+                    </div>
+                </div>
+                <div class="row" ng-show="State === 5">
+                    <div class="col-xs-4 col-xs-offset-4">
+                        <table class="table">
+                            <tr class="row" ng-repeat="player in Players | orderBy:Points">
+                                <td>
+                                    {{ $index + 1 }}
+                                </td>
+                                <td>
+                                    {{ player.Name }}
+                                </td>
+                                <td>
+                                    {{ player.Points }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.gameId = "@Model.Id";
+        window.PlayerId = "@ViewBag.PlayerID";
+    </script>
+</body>
+</html>

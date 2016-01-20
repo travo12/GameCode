@@ -1,0 +1,231 @@
+﻿@model Planc.Dal.GameModels.LeeGame.Lee
+@{
+    ViewBag.Title = "Lee Game" + Model.Id;
+}
+<!DOCTYPE html>
+
+<html ng-app="lee">
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <title>Lee</title>
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet"/>
+    <link href="~/Style/Lee.css" rel="stylesheet"/>
+
+    <script src="~/Scripts/Lee.js"></script>
+</head>
+<body ng-controller="LeeController">
+<div class="container-fluid" ng-show="Game.State !== 1">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="text-center">Round {{ Game.CurrentRoundNum }}</h2>
+        </div>
+    </div>
+</div>
+<div id="selectName" class="container-fluid" ng-show="Game.State === 1">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="text-center">Lee</h2>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                The Game is about to begin.  Please stand by.
+            </div>
+        </div>
+    </div>
+</div>
+<div id="waiting" class="container-fluid" ng-show="Game.State === 1">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="text-center">Let's Get Ready to Rumble</h2>
+        </div>
+    </div>
+    <div class="row" ng-repeat="player in Game.Players">
+        <div class="col-xs-12">
+            {{ player.Name }}
+        </div>
+    </div>
+    <div ng-show="PlayerId === Game.Admin">
+        <button class="btn btn-primary" id="startbutton">Start</button>
+    </div>
+</div>
+<div class="container-fluid" id="qna" ng-show="Game.State === 2 && !Waiting">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 class="text-center">Leader Board</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4 col-xs-offset-4">
+            <table class="table">
+                <tr class="row" ng-repeat="player in Game.Players | orderBy:Points">
+                    <td>
+                        {{ player.Name }}
+                    </td>
+                    <td>
+                        {{ player.Points }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 class="text-center">{{ CurrRound.Question }}</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            Players are now submitting their answer.
+        </div>
+    </div>
+</div>
+<div class="container-fluid" id="vote" ng-show="Game.State === 3 && !Waiting">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 class="text-center">Leader Board</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4 col-xs-offset-4">
+            <table class="table">
+                <tr class="row" ng-repeat="player in Game.Players | orderBy:Points">
+                    <td>
+                        {{ player.Name }}
+                    </td>
+                    <td>
+                        {{ player.Points }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel panel-success">
+                <h4 class="text-center">{{ CurrRound.Question }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-success">
+                <div class="panel-body text-center">
+                    <p>Answers submitted. Waiting for players to vote..</p>
+                </div>
+                <ul class="list-group" ng-repeat="pinput in CurrRound.PlayerInputs | orderBy:random">
+                    <li class="list-group-item" ng-hide="pinput.PlayerID === PlayerId">{{ pinput.Answer }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid" id="results" ng-show="Game.State === 4 && !Waiting">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 class="text-center">Points</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4 col-xs-offset-4">
+            <table class="table">
+                <tr class="row" ng-repeat="pinput in CurrRound.PlayerInputs | orderBy:VR">
+                    <td>
+                        {{ pinput.PlayerName }}
+                    </td>
+                    <td>
+                        {{ pinput.Score }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="text-center text-green">{{ WinnerText }}</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 class="text-center">Votes</h3>
+        </div>
+    </div>
+    <div class="row" ng-repeat="pinput in CurrRound.PlayerInputs | orderBy:VR">
+        <div class="col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {{ pinput.PlayerName }}'s Response: {{ pinput.Answer }}
+                </div>
+                <div class="panel-footer">
+                    Votes:<br/>
+                    <span ng-repeat="voterName in CurrRound.PlayerInputs | vote:pinput">{{ voterName.PlayerName }}<br /></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 class="text-center">Leader Board</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4 col-xs-offset-4">
+            <table class="table">
+                <tr class="row" ng-repeat="player in Game.Players | orderBy:Points">
+                    <td>
+                        {{ player.Name }}
+                    </td>
+                    <td>
+                        {{ player.Points }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row" ng-show="PlayerId === Game.Admin">
+        <div class="col-xs-12">
+            <button class="btn btn-primary" id="newroundbutton" ng-click="newRound()">Next Round</button>
+        </div>
+    </div>
+</div>
+<div class="container-fluid" id="final" ng-show="Game.State === 5">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="text-center text-green">Game Over</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 class="text-center">Leader Board</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4 col-xs-offset-4">
+            <table class="table">
+                <tr class="row" ng-repeat="player in Game.Players | orderBy:Points">
+                    <td>
+                        {{ player.Name }}
+                    </td>
+                    <td>
+                        {{ player.Points }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    window.gameId = "@Model.Id";
+    window.PlayerId = "@ViewBag.PlayerID";
+</script>
+</body>
+</html>

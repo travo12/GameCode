@@ -1,0 +1,114 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="KeyDesign" />
+    <meta name="description" content="Unsafe Spaces - App Landing Page" />
+    <meta name="keywords" content="Unsafe Spaces , Landing page, Template, App, Mobile, Android, iOS" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!-- SITE TITLE -->
+    <title>Unsafe Spaces - App Landing Page</title>
+    <!-- FAVICON -->
+    <link rel="icon" href="images/favicon.ico">
+
+    <!-- WEB FONTS -->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:100,300,400,600,700' rel='stylesheet' type='text/css'>
+
+    <!-- STYLESHEETS -->
+    <link rel="stylesheet" type="text/css" href="~/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="~/fonts/flaticon.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/responsive.css" />
+    <!--<link href="~/Style/Lee.css" rel="stylesheet" /> -->
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.min.css" rel="stylesheet" />
+    <!-- JQUERY -->
+    <script src="~/js/jquery.min.js"></script>
+</head>
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader"><img src="~/images/logo.png" /></div>
+
+    <!-- MAIN NAV -->
+    <a id="main-nav" href="#sidr"><span class="flaticon-menu9"></span></a>
+    <div id="sidr" class="sidr">
+
+        <!-- MAIN NAV LOGO -->
+        <a href="#" id="menu-logo"><img src="~/images/menu-logo.png" alt=""></a>
+
+        <!-- MAIN NAV LINKS -->
+        <ul>
+            <li>
+                <a href="#Home"><span class="icons flaticon-house3"></span>Home</a>
+            </li>
+            <li>
+                <a href="#Features"><span class="icons flaticon-drawer1"></span>Features</a>
+            </li>
+            <li>
+                <a href="#About"><span class="icons flaticon-cursor7"></span>About</a>
+            </li>
+            <li>
+                <a href="#Video"><span class="icons flaticon-key9"></span>Video</a>
+            </li>
+            <li>
+                <a href="#Clients"><span class="icons flaticon-comment2"></span>Clients</a>
+            </li>
+            <li>
+                <a href="#Screenshots"><span class="icons flaticon-camera19"></span>Screenshots</a>
+            </li>
+            <li>
+                <a href="/account/login"><span class="icons flaticon-tag10"></span>Login</a>
+            </li>
+            <li>
+                <a href="#Download"><span class="icons flaticon-download11"></span>Download</a>
+            </li>
+            <li>
+                <a href="#Contact"><span class="icons flaticon-small72"></span>Contact</a>
+            </li>
+        </ul>
+        <!-- END MAIN NAV LINKS -->
+    </div>
+    <!-- END MAIN NAV -->
+    <!-- PAGE LOGO -->
+    <div class="wrap">
+        <div id="logo">
+            <a href="#"><img src="~/images/logo.png" alt=""> </a>
+        </div>
+    </div>
+    <!-- END PAGE LOGO -->
+    <!-- LANDING PAGE CONTENT -->
+    <div id="fullpage">
+        @RenderBody()
+        </div>
+        <!-- SECTION CONTACT -->
+        <!-- SOCIAL ICONS -->
+        <div class="wrap">
+            <div id="social-icons">
+                <ul>
+                    <li><a href=""><i class="flaticon-facebook6"></i></a> </li>
+                    <li><a href=""><i class="flaticon-social19"></i></a> </li>
+                    <li><a href=""><i class="flaticon-google16"></i></a> </li>
+                    <li><a href=""><i class="flaticon-social40"></i></a> </li>
+                    <li><a href=""><i class="flaticon-social7"></i></a> </li>
+                    <li><a href=""><i class="flaticon-logo3"></i></a> </li>
+                </ul>
+            </div>
+        </div>
+        <!-- END SOCIAL ICONS -->
+        <!-- SCRIPTS -->
+        <script src="~/js/jquery.easings.min.js"></script>
+        <script src="~/js/jquery.fullPage.js"></script>
+        <script src="~/js/cbpFWTabs.js"></script>
+        <script src="~/js/jquery.sidr.min.js"></script>
+        <script src="~/js/scripts.js"></script>
+        <!--<script type="text/javascript" src="js/video.js"></script> -->
+        @RenderSection("scripts", required: false)
+</body>
+</html>
+
